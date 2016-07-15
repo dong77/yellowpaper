@@ -192,19 +192,20 @@ $10^{18}$ & 以太（Ether） \\
 
 \section{区块, 状态和交易} \label{ch:bst}
 
-Having introduced the basic concepts behind Ethereum, we will discuss the meaning of a transaction, a block and the state in more detail.
+介绍完以太坊的基本概念后，我们来更细地讨论交易，区块，和状态的含义。
 
-\subsection{World State} \label{ch:state}
 
-The world state (\textit{state}), is a mapping between addresses (160-bit identifiers) and account states (a data structure serialised as RLP, see Appendix \ref{app:rlp}). Though not stored on the blockchain, it is assumed that the implementation will maintain this mapping in a modified Merkle Patricia tree (\textit{trie}, see Appendix \ref{app:trie}). The trie requires a simple database backend that maintains a mapping of bytearrays to bytearrays; we name this underlying database the state database. This has a number of benefits; firstly the root node of this structure is cryptographically dependent on all internal data and as such its hash can be used as a secure identity for the entire system state. Secondly, being an immutable data structure, it allows any previous state (whose root hash is known) to be recalled by simply altering the root hash accordingly. Since we store all such root hashes in the blockchain, we are able to trivially revert to old states.
+\subsection{世界状态（World State）} \label{ch:state}
 
-The account state comprises the following four fields:
+世界状态 (\textit{状态})是一个地址（160位标识符）和账户状态（序列化成RLP的一种数据结构，参见附录\ref{app:rlp}）之间的映射表。 虽然世界状态并不存储在区块链中，但实现时会在一个经过改造的Merkle Patricia树(\textit{trie树}, 参见附录 \ref{app:trie})中维护这个映射表。Trie树需要一个简单的后台数据库来维护一个从字节数组（bytearray）到字节数组的映射表；我们称这个底层的数据库为状态数据库。这种做法有一些列优势：首先该结构的根节点在密码学上依赖于所有内部数据，因此根节点的散列值可被用作整个系统状态的一个安全的身份标识。其次，该结构是不可改变的，因此可以通过适当更改根节点的散列值召回任何之前的（散列值已知的）状态。因为我们在区块链上存储所有根节点的散列值，我们就可以毫不费力地回复到老状态。
+
+账户状态包含以下四个域：
 
 \begin{description}
-\item[nonce] A scalar value equal to the number of transactions sent from this address or, in the case of accounts with associated code, the number of contract-creations made by this account. For account of address $a$ in state $\boldsymbol{\sigma}$, this would be formally denoted $\boldsymbol{\sigma}[a]_n$.
-\item[balance] A scalar value equal to the number of Wei owned by this address. Formally denoted $\boldsymbol{\sigma}[a]_b$.
-\item[storageRoot] A 256-bit hash of the root node of a Merkle Patricia tree that encodes the storage contents of the account (a mapping between 256-bit integer values), encoded into the trie as a mapping from the Keccak 256-bit hash of the  256-bit integer keys to the RLP-encoded 256-bit integer values. The hash is formally denoted $\boldsymbol{\sigma}[a]_s$.
-\item[codeHash] The hash of the EVM code of this account---this is the code that gets executed should this address receive a message call; it is immutable and thus, unlike all other fields, cannot be changed after construction. All such code fragments are contained in the state database under their corresponding hashes for later retrieval. This hash is formally denoted $\boldsymbol{\sigma}[a]_c$, and thus the code may be denoted as $\mathbf{b}$, given that $\texttt{\small KEC}(\mathbf{b}) = \boldsymbol{\sigma}[a]_c$.
+\item[nonce] 一个标量，其值等于从该地址发送出的交易数，或者，对于有代码的账户，其值等于该账户生成的合约数量。对于在状态$\boldsymbol{\sigma}$中的地址$a$，该域可形式上表示为 $\boldsymbol{\sigma}[a]_n$。
+\item[balance] 余额，是一个标量，其值等于该地址拥有的以太数量（以`伟'为单位）。形式上表示为$\boldsymbol{\sigma}[a]_b$。
+\item[storageRoot] 存储根，它是存储账户内容的Merkle Patricia树的根节点的256位散列值。账户内容是一个从256位整数的键（key）的256位Keccak散列值到RLP编码的256位整数的值（value）的映射表，编码成一个Trie树形式。存储根形式上表示为 $\boldsymbol{\sigma}[a]_s$。
+\item[codeHash] 代码散列，该账户EVM代码 --- 就是该地址一旦接收到消息调用就要执行的代码 -- 的散列值；由于账户代码是不可更改的，因此不像其它域，该域在账户生成后就不能被更改。所有代码片段都存储在状态数据库中，并且可用代码散列查询使用。代码散列形式上表示为 $\boldsymbol{\sigma}[a]_c$，因此代码如果表示为$\mathbf{b}$，就有$\texttt{\small KEC}(\mathbf{b}) = \boldsymbol{\sigma}[a]_c$。
 \end{description}
 
 Since I typically wish to refer not to the trie's root hash but to the underlying set of key/value pairs stored within, I define a convenient equivalence:
