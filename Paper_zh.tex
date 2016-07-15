@@ -58,7 +58,7 @@
 \pagecolor{lightpink}
 
 \begin{abstract}
-一些列的项目，特别是比特币，已经证明了区块链在结合了经密码保护的交易后的应用价值。每个这样项目都可以被视为建立在去中心化的，整体而言却构成单例的，计算资源上的简单应用。我们可以称区块链的模式为共享状态，支持交易的单例计算机。
+一些列的项目，特别是比特币，已经证明了区块链模式在结合了经密码保护的交易后的应用价值。每个这样项目都可以被视为建立在去中心化的，整体而言却构成单例的，计算资源上的简单应用。我们可以称区块链的模式为共享状态，支持交易的单例计算机。
 
 以太坊用一种更通用的方式实现这种模式。而且它提供丰富的计算资源，每个资源都有不同的状态和操作代码，但能够通过消息传递框架与彼此交互。在本文我们探讨它的设计，实现问题，以及它带来的机遇和未来可能的挑战。
 \end{abstract}
@@ -95,6 +95,64 @@ Additional work has been done in the area with discarding the decentralisation f
 Early work on smart contracts has been done by \cite{szabo1997formalizing} and \cite{miller1997future}. Around the 1990s it became clear that algorithmic enforcement of agreements could become a significant force in human cooperation. Though no specific system was proposed to implement such a system, it was proposed that the future of law would be heavily affected by such systems. In this light, Ethereum may be seen as a general implementation of such a \textit{crypto-law} system.
 
 %E language?
+
+
+\section{区块链（Blockchain）模式} \label{ch:overview}
+
+以太坊作为一个整体可被视为基于交易的状态机：我们从一个创世纪（genesis）状态开始，递增执行交易来改变状态机到某个最终状态。这个最终状态将被我们认定为以太坊世界的权威性``版本''。状态中包含的信息包括账户余额，声誉，信任安排，物理世界数据，终止，任何计算机可以表示的数据都可以。因此交易是两个状态间的一条合法的弧线；这里`合法`非常重要 -- 不合法的变更改变要远远多于合法的状态改变。 例如减少一个账户的余额但没有在其它账户中做等量余额增加就是不合法的状态变更。一个合法的状态需要经过一个交易。形式化表达为：
+
+\begin{equation}
+\boldsymbol{\sigma}_{t+1} \equiv \Upsilon(\boldsymbol{\sigma}_t, T)
+\end{equation}
+
+其中$\Upsilon$是以太坊状态转换函数。 在以太坊中，$\Upsilon$ 和$\boldsymbol{\sigma}$ 结合一起比任何现存的比较系统都更强大。$\Upsilon$ 允许模块进行任意计算，而 $\boldsymbol{\sigma}$ 允许模块存储交易间的任何状态。
+
+多个交易被收集合并成一个区块（Block),多个区块通过基于密码学的散列值链接起来成为区块链，散列值也被用作块的引用。区块的作用类似与日志，用来记录一些列交易，前一个区块，以及最终状态的标识符（但不存储最终状态本身 --- 否者就太大了）。区块间穿插着节点\textit{挖矿}所需的激励。这种激励措施在状态转换函数中发生，其结果是给指定的账户增加余额。
+
+挖矿是通过贡献算力（工作量）推举一系列交易（一个区块）战胜其它潜在的竞争区块的过程。挖矿依赖于一种密码学上安全的证明。这种证明被称为工作量证明（Proof-of-Work），我们会在 \ref{ch:pow} 章节做详细探讨。
+
+我们在公式上进一步展开：
+\begin{eqnarray}
+\boldsymbol{\sigma}_{t+1} & \equiv & \Pi(\boldsymbol{\sigma}_t, B) \\
+B & \equiv & (..., (T_0, T_1, ...) ) \\
+\Pi(\boldsymbol{\sigma}, B) & \equiv & \Omega(B, \Upsilon(\Upsilon(\boldsymbol{\sigma}, T_0), T_1) ...)
+\end{eqnarray}
+
+其中 $\Omega$ 是确认区块终态的变更函数（它回馈指定的参与方）；$B$ 是当前区块，包含一些列交易和其它数据；$\Pi$ 是区块级的状态变更函数。
+
+这就是区块链的基础模型，它不仅仅是以太坊，也是目前所有去中心化的，基于共识的交易系统的骨架。
+
+
+\subsection{价值}
+
+为了激励网络中的计算，以太坊需要有个公认的价值传递方式。为了解决这个问题，以太坊引入了一个内在的货币，以太（Ether），也被称作{\small ETH}，有时用英文字母 \DH{}表示。以太的最小单位，也是该货币整数值计数所用的单位，叫伟（Wei）。一个以太被定义为 $10^{18}$ 个伟。除此之外还有其它以子单位：
+
+\par
+\begin{center}
+\begin{tabular}{rl}
+\toprule
+乘数 & 子单位名字 \\
+\midrule
+$10^0$ & 伟（Wei） \\
+$10^{12}$ & 萨博（Szabo） \\
+$10^{15}$ & 芬尼（Finney） \\
+$10^{18}$ & 以太（Ether） \\
+\bottomrule
+\end{tabular}
+\end{center}
+\par
+
+
+在本文中提到以太价值，货币，余额，付款的时候，我们默认都是以伟作为计数单位。
+
+\subsection{哪个历史？}
+
+既然系统是去中心化的，且任何参与方都有机会在前序区块的基础上生成一个新的区块，其结果就一定是个区块的树形结构。为了对区块链，也就是从根节点区块（创世纪区块）到某个叶节点区块（包含最新交易的区块）的路径，达成共识，就需要一个大家都认同的方案。如果网络节点对哪个路径才是`最好'的区块链存在分歧，就会发生\textit{fork} 。
+
+这意味着在某个时间节点（区块）后，可能有多种系统状态共存：一些节点认为这个区块包含权威的交易，另一些节点认为那个区块包含权威的交易，这些区块可能包含根本不同或不兼容的交易。这种情况需要尽最大可能避免，否则造成的不确定性可能毁掉对整个系统的信心。
+
+我们用来达成共识的方案是由\cite{cryptoeprint:2013:881}引入的GHOST协议的一个简化版。我们在\ref{ch:ghost}章节描述这个方案的流程。
+
 
 \end{multicols}
 \end{document}
