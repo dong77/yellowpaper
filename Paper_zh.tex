@@ -14,7 +14,7 @@
 \usepackage{subfig}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage[a4paper,width=170mm,top=18mm,bottom=22mm,includeheadfoot]{geometry}
+\usepackage[a4paper,width=180mm,top=18mm,bottom=22mm,includeheadfoot]{geometry}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{verbatim}
@@ -51,7 +51,6 @@
     Founder, Ethereum \& Ethcore\\
     gavin@ethcore.io
 }
-
 \begin{document}
 
 %\pagecolor{lightyellow}
@@ -155,15 +154,15 @@ $10^{18}$ & 以太（Ether） \\
 
 \section{约定}\label{ch:conventions}
 
-对于正规符号，我使用一些列的印刷方面的约定，其中的一些是本文特有的：
+我使用一系列的印刷体上的约定来做符号表达，其中一些是本文特有的：
 
-两类高度结构化的，`顶级的'，状态值，用粗体小写希腊字母表示。这两类分别是世界状态，用$\boldsymbol{\sigma}$（或其变种）表示，和机器状态，用$\boldsymbol{\mu}$表示。
+两类高度结构化的，`顶级的'状态值，用粗体小写希腊字母表示。这两类分别是世界状态，用$\boldsymbol{\sigma}$（或其变种）表示，和机器状态，用$\boldsymbol{\mu}$表示。
 
 高度结构化值上的函数用大写希腊字母表示，比如以太坊状态转换函数用$\Upsilon$表示。
 
-大多数函数用大写字母表示，比如一般的成本函数（cost function）用$C$表示。函数符号可以通过加下标来表示特定的变种，比如{\tiny SSTORE} 操作的成本函数用$C_\text{\tiny SSTORE}$表示。对于特定的及有可能是外部定义的函数，我可能用打字机字体表示，比如Keccak-256散列函数（SHA-3竞赛的获奖者）用$\texttt{KEC}$表示（通常被称为简单Keccak散列函数）。$\texttt{KEC512}$被称为Keccak 512散列函数。
+大多数函数用大写字母表示，比如一般的成本函数（cost function）用$C$表示。函数符号可以通过加下标来表示特定的变种，比如{\tiny SSTORE} 操作的成本函数用$C_\text{\tiny SSTORE}$表示。对于特定的和有可能是外部定义的函数，我可能用打字机字体表示，比如Keccak-256散列函数（SHA-3竞赛的获奖者）用$\texttt{KEC}$表示（通常被称为简单Keccak散列函数）。$\texttt{KEC512}$被称为Keccak 512散列函数。
 
-元组（Tuple）一般用一个大写字母表示，比如$T$用来表示一个以太坊交易。可为该符号加下标来标识它的单个组成部分，比如$T_n$表示该交易的nonce。下标的格式标明其类型，比如大写的下标说明该元组有可通过下标标识的组成部分。
+元组（Tuple）一般用一个大写字母表示，比如$T$用来表示一个以太坊交易。可为该符号加下标来标识它的单个组成部分，比如$T_n$表示该交易的nonce。下标的格式标明其类型，比如大写的下标说明该元组有可通过下标标识组成部分。
 
 标量（Scalar）和固定大小的字节序列（或叫字节数组）用一个小写字母表示，比如本文中交易的nonce用$n$表示。有特殊意义的值可能用希腊字母表示，比如栈上某个操作所需的数据数目用$\delta$表示。
 
@@ -171,14 +170,14 @@ $10^{18}$ & 以太（Ether） \\
 
 我们通篇假设标量都是正整数，因此属于$\mathbb{P}$集合。所有字节顺序列的集合为 $\mathbb{B}$，在附录\ref{app:rlp}中给出正式定义。有特别长度限制的字符序列集合用下标标识，因此所有长度为$32$ 的字节序列集合被称为$\mathbb{B}_{32}$，所有小于$2^{256}$ 的正整数集合被称为$\mathbb{P}_{256}$。其正式定义被放到\ref{ch:block}章节。
 
-方括号用来索引和引用序列中的单个组件或子序列，比如 $\boldsymbol{\mu}_\mathbf{s}[0]$表示机器栈上的第一项。对于子序列，我们用省略号来指明区域，比如$\boldsymbol{\mu}_\mathbf{m}[0..31]$表示机器内存的前32项。
+方括号用来索引和引用序列中的单个元素或子序列，比如 $\boldsymbol{\mu}_\mathbf{s}[0]$表示机器栈上的第一项。对于子序列，我们用省略号来指明区域，比如$\boldsymbol{\mu}_\mathbf{m}[0..31]$表示机器内存的前32项。
 
 对于全局状态$\boldsymbol{\sigma}$，其本身是一组账户，账户本身又是元组，方括号用来表示单个账户。
 
 
-当考虑现有值的各种变化的时候，我的原则是在定义的范围内，如果用占位符$\Box$ 表示某个未被更改的`输入'值，那么改变后和可用值就用$\Box'$表示，中间值用$\Box^*$,  $\Box^{**}$等表示。特别情况下，为了最大化可读性并且不会引入歧义的时候，我可能用字母或数字下标去标识中间值，尤其是那些需要特别关注的中间值。
+当考虑现有值的各种变化的时候，我的原则是在定义的范围内，如果用占位符$\Box$ 表示某个未被更改的`输入'值，那么改变后和可用值就用$\Box'$表示，中间值用$\Box^*$,  $\Box^{**}$等表示。特别情况下，为了最大化可读性并且在不引入歧义时候，我可能用字母或数字下标去标识中间值，尤其是那些需要特别关注的中间值。
 
-在使用现有函数时，对于函数 $f$，我用函数$f^*$表示一个和原函数相似的，序列元素级别的映射函数。其正式定义被放到\ref{ch:block}章节。
+在使用现有函数时，对于函数 $f$，我用函数$f^*$表示一个和原函数相似的，但是是在序列元素级别的映射函数。其正式定义被放到\ref{ch:block}章节。
 
 另外我定义了一些有用的函数。其中一个常用的是 $\ell$，它返回一个序列的末项。
 
@@ -197,99 +196,106 @@ $10^{18}$ & 以太（Ether） \\
 
 \subsection{世界状态（World State）} \label{ch:state}
 
-世界状态 (\textit{状态})是一个地址（160位标识符）和账户状态（序列化成RLP的一种数据结构，参见附录\ref{app:rlp}）之间的映射表。 虽然世界状态并不存储在区块链中，但实现时会在一个经过改造的Merkle Patricia树(\textit{trie树}, 参见附录 \ref{app:trie})中维护这个映射表。Trie树需要一个简单的后台数据库来维护一个从字节数组（bytearray）到字节数组的映射表；我们称这个底层的数据库为状态数据库。这种做法有一些列优势：首先该结构的根节点在密码学上依赖于所有内部数据，因此根节点的散列值可被用作整个系统状态的一个安全的身份标识。其次，该结构是不可改变的，因此可以通过适当更改根节点的散列值召回任何之前的（散列值已知的）状态。因为我们在区块链上存储所有根节点的散列值，我们就可以毫不费力地回复到老状态。
+世界状态 (\textit{状态})是地址（160位标识符）和账户状态（序列化成RLP的一种数据结构，参见附录\ref{app:rlp}）之间的映射表。 虽然世界状态并不存储在区块链中，但会被存储在一个经过改造的Merkle Patricia树(\textit{Trie树}, 参见附录 \ref{app:trie})中。Trie树需要一个简单的后台数据库来维护从字节数组（bytearray）到字节数组的一个映射表；我们称这个底层的数据库为状态数据库。使用状态数据库有一系列优势：首先该结构的根节点在密码学上依赖于所有内部数据，因此根节点的散列值可被用作整个系统状态的一个安全的身份标识。其次，该结构是不可改变的，因此可以通过适当更改根节点的散列值回退到任何之前的（散列值已知的）状态。因为我们在区块链上存储所有根节点的散列值，这样就可以毫不费力地做状态回退。
 
 账户状态包含以下四个域：
 
 \begin{description}
-\item[nonce] 一个标量，其值等于从该地址发送出的交易数，或者，对于有代码的账户，其值等于该账户生成的合约数量。对于在状态$\boldsymbol{\sigma}$中的地址$a$，该域可形式上表示为 $\boldsymbol{\sigma}[a]_n$。
-\item[balance] 余额，是一个标量，其值等于该地址拥有的以太数量（以`伟'为单位）。形式上表示为$\boldsymbol{\sigma}[a]_b$。
-\item[storageRoot] 存储根，它是存储账户内容的Merkle Patricia树的根节点的256位散列值。账户内容是一个从256位整数的键（key）的256位Keccak散列值到RLP编码的256位整数的值（value）的映射表，编码成一个Trie树形式。存储根形式上表示为 $\boldsymbol{\sigma}[a]_s$。
-\item[codeHash] 代码散列，该账户EVM代码 --- 就是该地址一旦接收到消息调用就要执行的代码 -- 的散列值；由于账户代码是不可更改的，因此不像其它域，该域在账户生成后就不能被更改。所有代码片段都存储在状态数据库中，并且可用代码散列查询使用。代码散列形式上表示为 $\boldsymbol{\sigma}[a]_c$，因此代码如果表示为$\mathbf{b}$，就有$\texttt{\small KEC}(\mathbf{b}) = \boldsymbol{\sigma}[a]_c$。
+\item[nonce] 临造数，是一个标量，其值是从该地址发送出的交易数；对于有代码的账户，其值是该账户生成的合约数量。对于在状态$\boldsymbol{\sigma}$中的地址$a$，该域可形式上表示为 $\boldsymbol{\sigma}[a]_n$。
+\item[balance] 余额，是一个标量，其值为该地址拥有的以太数量（以`伟'为单位）。形式上表示为$\boldsymbol{\sigma}[a]_b$。
+\item[storageRoot] 存储根散列，它是存储账户内容的Merkle Patricia树的根节点的256位散列值。账户内容是一个从256位整数的键（key）的256位Keccak散列值到RLP编码的256位整数的值（value）的映射表，编码成一个Trie树形式。存储散列形式上表示为 $\boldsymbol{\sigma}[a]_s$。
+\item[codeHash] 代码散列，该账户EVM代码 --- 就是该地址一旦接收到消息调用就要执行的代码 --- 的散列值；由于账户代码是不可更改的，因此不像其它域，该域在账户生成后就不能被更改。所有代码片段都存储在状态数据库中，并且可用代码散列查询使用。代码散列形式上表示为 $\boldsymbol{\sigma}[a]_c$，因此代码如果表示为$\mathbf{b}$，就有$\texttt{\small KEC}(\mathbf{b}) = \boldsymbol{\sigma}[a]_c$。
 \end{description}
 
-Since I typically wish to refer not to the trie's root hash but to the underlying set of key/value pairs stored within, I define a convenient equivalence:
+我一般会提及Trie树中存储的键值对，而不是数根节点的散列值，因此我给出下面这个方便使用的等价定义：
+
 \begin{equation}
 \texttt{\small TRIE}\big(L_I^*(\boldsymbol{\sigma}[a]_\mathbf{s})\big) \equiv \boldsymbol{\sigma}[a]_s
 \end{equation}
 
-The collapse function for the set of key/value pairs in the trie, $L_I^*$, is defined as the element-wise transformation of the base function $L_I$, given as:
+$L_I^*$是Trie树中键值对集合整体的坍塌函数，它被定义为在每个键值对上应用基本函数$L_I$的结果。$L_I$可被标示为：
+
 \begin{equation}
 L_I\big( (k, v) \big) \equiv \big(\texttt{\small KEC}(k), \texttt{\small RLP}(v)\big)
 \end{equation}
 
-where:
+其中：
 \begin{equation}
 k \in \mathbb{B}_{32} \quad \wedge \quad v \in \mathbb{P}
 \end{equation}
 
-It shall be understood that $\boldsymbol{\sigma}[a]_\mathbf{s}$ is not a `physical' member of the account and does not contribute to its later serialisation.
+需要明白的一点是，$\boldsymbol{\sigma}[a]_\mathbf{s}$并不是该账户的`物理'成员，因此对账户的序列化没有影响。【译者：$\boldsymbol{\sigma}[a]_\mathbf{s}$对于每个区块只有一个，因此被该块中的多个账户所共享。】
 
-If the \textbf{codeHash} field is the Keccak-256 hash of the empty string, i.e. $\boldsymbol{\sigma}[a]_c = \texttt{\small KEC}\big(()\big)$, then the node represents a simple account, sometimes referred to as a ``non-contract'' account.
+如果 \textbf{codeHash} 域是空字符串的256位Keccak散列值，即： $\boldsymbol{\sigma}[a]_c = \texttt{\small KEC}\big(()\big)$，那么该账户就是简单账户，有时也叫`非合约'账户。
 
-Thus we may define a world-state collapse function $L_S$:
+因此我们可以定义一个世界状态的坍塌函数$L_S$：
+
 \begin{equation}
 L_S(\boldsymbol{\sigma}) \equiv \{ p(a): \boldsymbol{\sigma}[a] \neq \varnothing \}
 \end{equation}
-where
+
+其中：
 \begin{equation}
 p(a) \equiv  \big(\texttt{\small KEC}(a), \texttt{\small RLP}\big( (\boldsymbol{\sigma}[a]_n, \boldsymbol{\sigma}[a]_b, \boldsymbol{\sigma}[a]_s, \boldsymbol{\sigma}[a]_c) \big) \big)
 \end{equation}
 
-This function, $L_S$, is used alongside the trie function to provide a short identity (hash) of the world state. We assume:
+函数$L_S$ 和Trie树函数一起被用来提供一个世界状态的短标识符（散列值）。我们假设：
+
 \begin{equation}
 \forall a: \boldsymbol{\sigma}[a] = \varnothing \; \vee \; (a \in \mathbb{B}_{20} \; \wedge \; v(\boldsymbol{\sigma}[a]))
 \end{equation}
-where $v$ is the account validity function:
+
+其中 $v$是账户的验证函数：
+
 \begin{equation}
 \quad v(x) \equiv x_n \in \mathbb{P}_{256} \wedge x_b \in \mathbb{P}_{256} \wedge x_s \in \mathbb{B}_{32} \wedge x_c \in \mathbb{B}_{32}
 \end{equation}
 
-\subsection{Homestead} \label{ch:homestead}
 
-A significant block number for compatibility with the public network is the block marking the transition between the {\it Frontier} and {\it Homestead} phases of the platform, which we denote with the symbol \firsthomesteadblock, defined thus
+
+\subsection{家园（Homestead）} \label{ch:homestead}
+
+界定平台从 {\it 前沿（Frontier）}阶段 到 {\it 家园（Homestead）}阶段间过度的那个区块对于公共网络上的兼容性至关重要。我们把它的编号\firsthomesteadblock 定义为：
 \begin{equation}
 \firsthomesteadblock \equiv 1,\! 150,\! 000
 \end{equation}
-The protocol was upgraded at this block, so this symbol appears in some equations to account for the changes.
 
-\subsection{The Transaction} \label{ch:transaction}
+从这个区块起，平台的协议被更新。为了体现这种协议变更，该符号会在一些公式中出现。
 
-A transaction (formally, $T$) is a single cryptographically-signed instruction constructed by an actor externally to the scope of Ethereum. While is assumed that the ultimate external actor will be human in nature, software tools will be used in its construction and dissemination\footnote{Notably, such `tools' could ultimately become so causally removed from their human-based initiation---or humans may become so causally-neutral---that there could be a point at which they rightly be considered autonomous agents. \eg contracts may offer bounties to humans for being sent transactions to initiate their execution.}. There are two types of transactions: those which result in message calls and those which result in the creation of new accounts with associated code (known informally as `contract creation'). Both types specify a number of common fields:
+\subsection{交易} \label{ch:transaction}
 
-\begin{description}
-\item[nonce] A scalar value equal to the number of transactions sent by the sender; formally $T_n$.
-\item[gasPrice] A scalar value equal to the number of Wei to be paid per unit of \textit{gas} for all computation costs incurred as a result of the execution of this transaction; formally $T_p$.
-\item[gasLimit] A scalar value equal to the maximum amount of gas that should be used in executing this transaction. This is paid up-front, before any computation is done and may not be increased later; formally $T_g$.
-\item[to] The 160-bit address of the message call's recipient or, for a contract creation transaction, $\varnothing$, used here to denote the only member of $\mathbb{B}_0$ ; formally $T_t$.
-\item[value] A scalar value equal to the number of Wei to be transferred to the message call's recipient or, in the case of contract creation, as an endowment to the newly created account; formally $T_v$.
-\item[v, r, s] Values corresponding to the signature of the transaction and used to determine the sender of the transaction; formally $T_w$, $T_r$ and $T_s$. This is expanded in Appendix \ref{app:signing}.
-\end{description}
-
-Additionally, a contract creation transaction contains:
+交易 (用$T$表示) 是以太坊外的某个角色创建的，经过密码学签名的指令。虽然最终的角色总是人，但还是会通过软件来做指令的生成和传播\footnote{Notably, such `tools' could ultimately become so causally removed from their human-based initiation---or humans may become so causally-neutral---that there could be a point at which they rightly be considered autonomous agents. \eg contracts may offer bounties to humans for being sent transactions to initiate their execution.}。存在两种不同的交易：一种交易的执行结果是消息调用，另一种交易的执行结果是生成附有代码的新账户（也叫`合约生成'）。两种交易都包括下面几个公共域：
 
 \begin{description}
-\item[init] An unlimited size byte array specifying the EVM-code for the account initialisation procedure, formally $T_\mathbf{i}$.
+\item[nonce] 临造数,是一个标量，它的值是发送者发出的交易数，用$T_n$表示。
+\item[gasPrice] 油费价格，是一个标量。交易执行过程中需要为所有计算支付\textit{油费（gas）}。这个标量的值是每单位gas需要花费的以太数量。该值的单位是Wei，用$T_p$表示。
+\item[gasLimit] 油费上限，是一个标量，代表该交易执行过程中可消耗的gas的最大值。该费用是需要在交易执行前预支付的，且后续无法增大，用$T_g$表示。
+\item[to] 消息调用的长度为160位的接收地址；如果交易是用来生成新的合约，该值为$\varnothing$（这里代表$\mathbb{B}_0$的唯一成员）。该值用$T_t$表示。
+\item[value]代表转给目标地址的以太数。如果交易是用来生成新的合约，该值代表捐赠给该新合约的以太数。该值的单位是Wei，用$T_v$表示。
+\item[v, r, s] 对应于交易签名的三个域，可用作确定交易的发送者。表示为$T_w$, $T_r$ 和 $T_s$。附录 \ref{app:signing}中会对该域进行展开。
 \end{description}
 
-\textbf{init} is an EVM-code fragment; it returns the \textbf{body}, a second fragment of code that executes each time the account receives a message call (either through a transaction or due to the internal execution of code). \textbf{init} is executed only once at account creation and gets discarded immediately thereafter.
-
-In contrast, a message call transaction contains:
+除此之外，生成合约的交易还包含：
 
 \begin{description}
-\item[data] An unlimited size byte array specifying the input data of the message call, formally $T_\mathbf{d}$.
+\item[init] 用来存储账户初始化所需EVM代码的一个大小不限的字节数组，表示为$T_\mathbf{i}$。
 \end{description}
 
-Appendix \ref{app:signing} specifies the function, $S$, which maps transactions to the sender, and happens through the ECDSA of the SECP-256k1 curve, using the hash of the transaction (excepting the latter three signature fields) as the datum to sign. For the present we simply assert that the sender of a given transaction $T$ can be represented with $S(T)$.
+\textbf{init}是一段EVM代码；它会返回另一段叫\textbf{body}的代码。\textbf{body}在该账户每次接收到消息调用（被交易触发或因内部代码调用）时都会被执行一次。因此\textbf{init}只有在账户创建的时候执行一次，之后便被立即丢弃。
 
+相比而言，一个消息调用交易包含：
+
+\begin{description}
+\item[data] 用来存储消息调用输入数据的一个大小不限的字节数组，表示为$T_\mathbf{d}$。
+\end{description}
+在附录 \ref{app:signing} 中我们会具体说明一个用交易去计算其发送者的函数$S$, 实现方式是用SECP-256k1曲线上的ECDSA方法，对交易(除去用于签名的三个域)的哈希值进行签名计算。 目前我们简单用$S(T)$表示交易$T$的发送者。
 \begin{equation}
 L_T(T) \equiv \begin{cases}
-(T_n, T_p, T_g, T_t, T_v, T_\mathbf{i}, T_w, T_r, T_s) & \text{if} \; T_t = \varnothing\\
-(T_n, T_p, T_g, T_t, T_v, T_\mathbf{d}, T_w, T_r, T_s) & \text{otherwise} 
+(T_n, T_p, T_g, T_t, T_v, T_\mathbf{i}, T_w, T_r, T_s) & \text{如} \; T_t = \varnothing\\
+(T_n, T_p, T_g, T_t, T_v, T_\mathbf{d}, T_w, T_r, T_s) & \text{否则} 
 \end{cases}
 \end{equation}
-
-Here, we assume all components are interpreted by the RLP as integer values, with the exception of the arbitrary length byte arrays $T_\mathbf{i}$ and $T_\mathbf{d}$.
+这里我们假设除了任意长度字符数组$T_\mathbf{i}$和$T_\mathbf{d}$外，所有部分都用RLP转换为整数值：
 \begin{equation}
 \begin{array}[t]{lclclc}
 T_n \in \mathbb{P}_{256} & \wedge & T_v \in \mathbb{P}_{256} & \wedge & T_p \in \mathbb{P}_{256} & \wedge \\
@@ -297,69 +303,73 @@ T_g \in \mathbb{P}_{256} & \wedge & T_w \in \mathbb{P}_5 & \wedge & T_r \in \mat
 T_s \in \mathbb{P}_{256} & \wedge & T_\mathbf{d} \in \mathbb{B} & \wedge & T_\mathbf{i} \in \mathbb{B}
 \end{array}
 \end{equation}
-where
+其中：
 \begin{equation}
 \mathbb{P}_n = \{ P: P \in \mathbb{P} \wedge P < 2^n \}
 \end{equation}
 
-The address hash $T_\mathbf{t}$ is slightly different: it is either a 20-byte address hash or, in the case of being a contract-creation transaction (and thus formally equal to $\varnothing$), it is the RLP empty byte-series and thus the member of $\mathbb{B}_0$:
+地址散列$T_\mathbf{t}$略有不同：它要么是个20位的地址哈希；要么对于合约生成交易，是个空字符序列的RPL值（等于$\varnothing$），也就是$\mathbb{B}_0$的唯一成员：
 \begin{equation}
-T_t \in \begin{cases} \mathbb{B}_{20} & \text{if} \quad T_t \neq \varnothing \\
-\mathbb{B}_{0} & \text{otherwise}\end{cases}
+T_t \in \begin{cases} \mathbb{B}_{20} & \text{如} \quad T_t \neq \varnothing \\
+\mathbb{B}_{0} & \text{否则}\end{cases}
 \end{equation}
 
-\subsection{The Block} \label{ch:block}
+\subsection{区块} \label{ch:block}
 
-The block in Ethereum is the collection of relevant pieces of information (known as the block \textit{header}), $H$, together with information corresponding to the comprised transactions, $\mathbf{T}$, and a set of other block headers $\mathbf{U}$ that are known to have a parent equal to the present block's parent's parent (such blocks are known as \textit{ommers}\footnote{\textit{ommer} is the most prevalent (not saying much) gender-neutral term to mean ``sibling of parent''; see \url{http://nonbinary.org/wiki/Gender_neutral_language#Family_Terms}}). The block header contains several pieces of information:
+区块中包含由相关信息组成的区块头（block header）$H$，包含交易$\mathbf{T}$相关的信息，还包含一些其它区块的头$\mathbf{U}$，这些区块的父亲和这个区块父亲的父亲是同一个区块，因此这些区块也被称为\textit{ommers}\footnote{\textit{ommer} is the most prevalent (not saying much) gender-neutral term to mean ``sibling of parent''; see \url{http://nonbinary.org/wiki/Gender_neutral_language#Family_Terms}}。
+
+区块头包括下面几种信息：
 
 %\textit{TODO: Introduce logs}
 
 \begin{description}
-\item[parentHash] The Keccak 256-bit hash of the parent block's header, in its entirety; formally $H_p$.
-\item[ommersHash] The Keccak 256-bit hash of the ommers list portion of this block; formally $H_o$.
-\item[beneficiary] The 160-bit address to which all fees collected from the successful mining of this block be transferred; formally $H_c$.
-\item[stateRoot] The Keccak 256-bit hash of the root node of the state trie, after all transactions are executed and finalisations applied; formally $H_r$.
-\item[transactionsRoot] The Keccak 256-bit hash of the root node of the trie structure populated with each transaction in the transactions list portion of the block; formally $H_t$.
-\item[receiptsRoot] The Keccak 256-bit hash of the root node of the trie structure populated with the receipts of each transaction in the transactions list portion of the block; formally $H_e$.
-\item[logsBloom] The Bloom filter composed from indexable information (logger address and log topics) contained in each log entry from the receipt of each transaction in the transactions list; formally $H_b$.
-\item[difficulty] A scalar value corresponding to the difficulty level of this block. This can be calculated from the previous block's difficulty level and the timestamp; formally $H_d$.
-\item[number] A scalar value equal to the number of ancestor blocks. The genesis block has a number of zero; formally $H_i$.
-\item[gasLimit] A scalar value equal to the current limit of gas expenditure per block; formally $H_l$.
-\item[gasUsed] A scalar value equal to the total gas used in transactions in this block; formally $H_g$.
-\item[timestamp] A scalar value equal to the reasonable output of Unix's time() at this block's inception; formally $H_s$.
-\item[extraData] An arbitrary byte array containing data relevant to this block. This must be 32 bytes or fewer; formally $H_x$.
-\item[mixHash] A 256-bit hash which proves combined with the nonce that a sufficient amount of computation has been carried out on this block; formally $H_m$.
-\item[nonce] A 64-bit hash which proves combined with the mix-hash that a sufficient amount of computation has been carried out on this block; formally $H_n$.
+\item[parentHash] 父块散列，父区块头的256位Keccak散列值，表示为$H_p$。
+\item[ommersHash] 叔父散列，该区块ommer列表的256位Keccak散列值，表示为$H_o$。
+\item[beneficiary] 该区块挖矿所得费用的受益方的160位地址，表示为$H_c$。
+\item[stateRoot] 状态根散列，在所有交易被成功执行后，状态树根节点的256位Keccak散列值，表示为$H_r$。
+\item[transactionsRoot] 交易根散列，将该区块中交易列表中的每个交易填充到一个Trie树后，该Trie树根节点的256位Keccak散列值，表示为$H_t$。
+\item[receiptsRoot] 收据根散列，将该区块中交易列表中的每个交易的收据填充到一个Trie树后，该Trie树根节点的256位Keccak散列值，表示为$H_e$。
+\item[logsBloom] 由每个交易收据日志条目中所包含的可索引信息 --- 日志地址（logger address）和日志话题（log topics）--- 所构成的Bloom filter，表示为$H_b$。
+\item[difficulty] 难度，是一个代表该区块的难度级别的标量。它的值可以根据前一个块的难度和当前块的时间戳（tiemstamp）计算得来，表示为$H_d$。
+\item[number] 是一个标量，代表该区块一共有多少个祖先块，表示为$H_i$。创世纪区块的number是0。
+\item[gasLimit] 是一个标量，代表目前每个区块gas花销的上限，表示为$H_l$。
+\item[gasUsed] 是一个标量，其值是该区块中所有交易花费gas的总量，表示为$H_g$。
+\item[timestamp] 时间戳，是一个标量，其值是该区块开始时Unix系统time()方法调用的返回值，表示为$H_s$。
+\item[extraData] 和该区块相关的数据，是一个不超过32字节的字符数组，表示为$H_x$。
+\item[mixHash] 一个256位的散列值，它和nonce一起使用时可用来证明该区块上承载了足够的工作量，表示为$H_m$。
+\item[nonce] 临造数,是一个64位的散列值，它和mix-hash一起使用时可用来证明该区块上承载了足够的工作量，表示为$H_n$。
 \end{description}
 
-The other two components in the block are simply a list of ommer block headers (of the same format as above) and a series of the transactions. Formally, we can refer to a block $B$:
+区块中还有两部分，一个是ommer区块头的列表（格式和上面的一样），另一个是一系列的交易。我们形式上定义区块$B$为：
+
 \begin{equation}
 B \equiv (B_H, B_\mathbf{T}, B_\mathbf{U})
 \end{equation}
 
-\subsubsection{Transaction Receipt}
+\subsubsection{交易收据}
 
-In order to encode information about a transaction concerning which it may be useful to form a zero-knowledge proof, or index and search, we encode a receipt of each transaction containing certain information from concerning its execution. Each receipt, denoted $B_\mathbf{R}[i]$ for the $i$th transaction) is placed in an index-keyed trie and the root recorded in the header as $H_e$.
+[In order to encode information about a transaction concerning which it may be useful to form a zero-knowledge proof, or index and search, we encode a receipt of each transaction containing certain information from concerning its execution. Each receipt, denoted $B_\mathbf{R}[i]$ for the $i$th transaction) is placed in an index-keyed trie and the root recorded in the header as $H_e$.]
 
-The transaction receipt is a tuple of four items comprising the post-transaction state, $R_{\boldsymbol{\sigma}}$, the cumulative gas used in the block containing the transaction receipt as of immediately after the transaction has happened, $R_u$, the set of logs created through execution of the transaction, $R_\mathbf{l}$ and the Bloom filter composed from information in those logs, $R_b$:
+交易收据是包括下列信息的四元组：该交易执行后的状态$R_{\boldsymbol{\sigma}}$，该交易刚刚执行后该区块累计消耗的gas总量$R_u$，该交易执行过程中生成的日志集合$R_\mathbf{l}$，以及这些日志构成的Bloom filter $R_b$：
 \begin{equation}
 R \equiv (R_{\boldsymbol{\sigma}}, R_u, R_b, R_\mathbf{l})
 \end{equation}
 
-The function $L_R$ trivially prepares a transaction receipt for being transformed into an RLP-serialised byte array:
+函数 $L_R$ 简单地将交易收据转换为一个经RLP序列化后的字节数组：
 \begin{equation}
 L_R(R) \equiv (\mathtt{\small TRIE}(L_S(R_{\boldsymbol{\sigma}})), R_u, R_b, R_\mathbf{l})
 \end{equation}
-thus the post-transaction state, $R_{\boldsymbol{\sigma}}$ is encoded into a trie structure, the root of which forms the first item.
 
-We assert $R_u$, the cumulative gas used is a positive integer and that the logs Bloom, $R_b$, is a hash of size 2048 bits (256 bytes):
+因此该交易执行后的状态$R_{\boldsymbol{\sigma}}$ 被转码成一个Trie树结构，而该树的根是才是上面四元组的第一个值。
+
+我们断定累计消耗gas数量 $R_u$ 是个正整数，日志的Bloom filter $R_b$是个2048位（256字节）的散列值：
 \begin{equation}
 R_u \in \mathbb{P} \quad \wedge \quad R_b \in \mathbb{B}_{256}
 \end{equation}
 
 %Notably $B_\mathbf{T}$ does not get serialised into the block by the block preparation function $L_B$; it is merely a convenience equivalence.
 
-The log entries, $R_\mathbf{l}$, is a series of log entries, termed, for example, $(O_0, O_1, ...)$. A log entry, $O$, is a tuple of a logger's address, $O_a$, a series of 32-bytes log topics, $O_\mathbf{t}$ and some number of bytes of data, $O_\mathbf{d}$:
+日志集合$R_\mathbf{l}$是被分成多个段的，比如分成 $(O_0, O_1, ...)$格式。每个日志条目 $O$都是一个元组，由日志记录者地址$O_a$，一系列32字节的日志话题$O_\mathbf{t}$ ，和几个字节的数据$O_\mathbf{d}$组成：
 \begin{equation}
 O \equiv (O_a, ({O_\mathbf{t}}_0, {O_\mathbf{t}}_1, ...), O_\mathbf{d})
 \end{equation}
@@ -367,12 +377,13 @@ O \equiv (O_a, ({O_\mathbf{t}}_0, {O_\mathbf{t}}_1, ...), O_\mathbf{d})
 O_a \in \mathbb{B}_{20} \quad \wedge \quad \forall_{t \in O_\mathbf{t}}: t \in \mathbb{B}_{32} \quad \wedge \quad O_\mathbf{d} \in \mathbb{B}
 \end{equation}
 
-We define the Bloom filter function, $M$, to reduce a log entry include a single 256-byte hash:
+我们如下定义一个256字节的Bloom filter函数$M$：
 \begin{equation}
 M(O) \equiv \bigvee_{t \in \{O_a\} \cup O_\mathbf{t}} \big( M_{3:2048}(t) \big)
 \end{equation}
 
-where $M_{3:2048}$ is a specialised Bloom filter that sets three bits out of 2048, given an arbitrary byte series. It does this through taking the low-order 11 bits of each of the first three pairs of bytes in a Keccak-256 hash of the byte series. Formally:
+其中 $M_{3:2048}$ 是可应用在任意长度字节数组的一个2048位选3位的Bloom filter。具体的做法先计算该字节数组的Keccak-256散列值，然后将这个散列值的前三个字节对的地位11个byte对应位置的bit设为1。【译者：每个字节对是$2\times 8 = 16$位，取低的11位最多可以表达$2^{11} = 2048$个位置信息，刚好对应于Bloom filter的长度。】  $M_{3:2048}$形式表达为：
+
 \begin{eqnarray}
 M_{3:2048}(\mathbf{x}: \mathbf{x} \in \mathbb{B}) & \equiv & \mathbf{y}: \mathbf{y} \in \mathbb{B}_{256} \quad \text{where:}\\
 \mathbf{y} & = & (0, 0, ..., 0) \quad \text{except:}\\
@@ -380,11 +391,11 @@ M_{3:2048}(\mathbf{x}: \mathbf{x} \in \mathbb{B}) & \equiv & \mathbf{y}: \mathbf
 m(\mathbf{x}, i) &\equiv& \mathtt{\tiny KEC}(\mathbf{x})[i, i + 1] \bmod 2048
 \end{eqnarray}
 
-where $\mathcal{B}$ is the bit reference function such that $\mathcal{B}_j(\mathbf{x})$ equals the bit of index $j$ (indexed from 0) in the byte array $\mathbf{x}$.
+这里$\mathcal{B}$ 是个位引用函数，$\mathcal{B}_j(\mathbf{x})$代表字符数组$\mathbf{x}$的第$j$个位置（从0开始）的值。
 
-\subsubsection{Holistic Validity}
+\subsubsection{整体有效性}
 
-We can assert a block's validity if and only if it satisfies several conditions: it must be internally consistent with the ommer and transaction block hashes and the given transactions $B_\mathbf{T}$ (as specified in sec \ref{ch:finalisation}), when executed in order on the base state $\boldsymbol{\sigma}$ (derived from the final state of the parent block), result in a new state of the identity $H_r$:
+当且仅当一个区块满足下列条件时我们才肯定它是有效的：它必须与所有叔父区块的散列值和所有交易（对应\ref{ch:finalisation}章节的描述）的散列值具有内在一致性，当在（父亲区块的最终状态演化而来的）基础状态$\boldsymbol{\sigma}$之上按照顺序执行的时候，必须得到一个可用头$H_r$代表的一个新状态：
 \begin{equation}
 \begin{array}[t]{lclc}
 H_r &\equiv& \mathtt{\small TRIE}(L_S(\Pi(\boldsymbol{\sigma}, B))) & \wedge \\
@@ -409,7 +420,7 @@ Thus $\texttt{\small TRIE}(L_S(\boldsymbol{\sigma}))$ is the root node hash of t
 
 The values stemming from the computation of transactions, specifically the transaction receipts, $B_\mathbf{R}$, and that defined through the transactions state-accumulation function, $\Pi$, are formalised later in section \ref{sec:statenoncevalidation}.
 
-\subsubsection{Serialisation}
+\subsubsection{序列化}
 
 The function $L_B$ and $L_H$ are the preparation functions for a block and block header respectively. Much like the transaction receipt preparation function $L_R$, we assert the types and order of the structure for when the RLP transformation is required:
 \begin{eqnarray}
@@ -526,6 +537,24 @@ where $(n, m) = \mathtt{PoW}(H_{\hcancel{n}}, H_n, \mathbf{d})$
 
 Noting additionally that \textbf{extraData} must be at most 32 bytes.
 
+%-------------------------------------
+
+\section{油费和付款} \label{ch:payment}
+
+为了避免网络被乱用，规避图灵完备带来的不可避免的一些问题，以太繁重所有的可编程计算都是收费的。我们用\textit{gas} (参见附录\ref{app:fees}中各种计算的费用）作为费用的衡量标准。因此任何一段可编程计算（包括合约生成，消息调用，读取和使用账户存储空间，以及在虚拟机上执行的操作）都有一个被公认的gas消耗量。
+
+每个交易都有一个与gas相关的特定值：\textbf{gasLimit}。这是值是用发送者账户余额自动购买的gas的数量。购买时使用\textbf{gasPrice}指定的价格，该价格也同样包含在这个交易中。如果账户余额不足，该交易就被认定是无效的。之所以被称为\textbf{gasLimit}，是因为如果交易执行完毕后如果还有未用完的gas，这些剩余的gas会被（按原价）退回，得到的以太会退款到发送者的账户。在交易执行之外gas是不存在的。因此对于那些有可信代码的账户，设置一个较高的gas上限并不会有什么问题。
+
+
+
+总的来说，用来购买gas的以太如果不被退款，就会被转给一个受益人（\textit{beneficiary}）地址 - 这个地址一般是旷工控制的账户的地址。交易人可以自由设定想用的\textbf{gasPrice} ，但旷工也可以自由决定忽略哪些交易。高油费的交易会消耗发送者更多的以太，但对旷工也更有价值，因此被更多旷工放到区块中的可能性就更大。一般来说旷工会公布他们执行交易是愿意接受的最低油价，而交易者在选择油价的时候也可以询问旷工的公布的价格。由于矿工们可接受的最低油价是个（加权的）分布，交易人需要在降低油价和最大化自己的交易被及时挖到之间做个权衡。
+
+%\subsubsection{Determining Computation Costs}
+
+%-------------------------------------
+%-------------------------------------
+%-------------------------------------
+%-------------------------------------
 %-------------------------------------
 
 \end{multicols}
