@@ -272,7 +272,7 @@ p(a) \equiv  \big(\texttt{\small KEC}(a), \texttt{\small RLP}\big( (\boldsymbol{
 \item[gasLimit] 油费上限，是一个标量，代表该交易执行过程中可消耗的gas的最大值。该费用是需要在交易执行前预支付的，且后续无法增大，用$T_g$表示。
 \item[to] 消息调用的长度为160位的接收地址；如果交易是用来生成新的合约，该值为$\varnothing$（这里代表$\mathbb{B}_0$的唯一成员）。该值用$T_t$表示。
 \item[value]代表转给目标地址的以太数。如果交易是用来生成新的合约，该值代表捐赠给该新合约的以太数。该值的单位是Wei，用$T_v$表示。
-\item[v, r, s] 对应于交易签名的三个域，可用作确定交易的发送者。表示为$T_w$, $T_r$ 和 $T_s$。附录 \ref{app:signing}中会对该域进行展开。
+\item[v, r, s] 与交易签名相关的三个域，可用作来确定交易的发送者。表示为$T_w$, $T_r$ 和 $T_s$。附录 \ref{app:signing}中会对该域进行展开。
 \end{description}
 
 除此之外，生成合约的交易还包含：
@@ -393,7 +393,7 @@ m(\mathbf{x}, i) &\equiv& \mathtt{\tiny KEC}(\mathbf{x})[i, i + 1] \bmod 2048
 
 这里$\mathcal{B}$ 是个位引用函数，$\mathcal{B}_j(\mathbf{x})$代表字符数组$\mathbf{x}$的第$j$个位置（从0开始）的值。
 
-\subsubsection{整体有效性}
+\subsubsection{整体合法性}
 
 当且仅当一个区块满足下列条件时我们才肯定它是有效的：它必须与所有叔父区块的散列值和所有交易（对应\ref{ch:finalisation}章节的描述）的散列值具有内在一致性，当在（父亲区块的最终状态演化而来的）基础状态$\boldsymbol{\sigma}$之上按照顺序执行的时候，必须得到一个可用头$H_r$代表的一个新状态：
 \begin{equation}
@@ -406,34 +406,34 @@ H_b &\equiv& \bigvee_{\mathbf{r} \in B_\mathbf{R}} \big( \mathbf{r}_b \big)
 \end{array}
 \end{equation}
 
-where $p(k, v)$ is simply the pairwise RLP transformation, in this case, the first being the index of the transaction in the block and the second being the transaction receipt:
+这里 $p(k, v)$ 是个简单数据对维度的RLP转换 --- 第一个数据是该区块交易的序号，第二个数据是交易的收据：
 \begin{equation}
 p(k, v) \equiv \big( \mathtt{\small RLP}(k), \mathtt{\small RLP}(v) \big)
 \end{equation}
 
-Furthermore:
+另外：
 \begin{equation}
 \mathtt{\small TRIE}(L_S(\boldsymbol{\sigma})) = {P(B_H)_H}_r
 \end{equation}
 
-Thus $\texttt{\small TRIE}(L_S(\boldsymbol{\sigma}))$ is the root node hash of the Merkle Patricia tree structure containing the key-value pairs of the state $\boldsymbol{\sigma}$ with values encoded using RLP, and $P(B_H)$ is the parent block of $B$, defined directly.
+因此 $\texttt{\small TRIE}(L_S(\boldsymbol{\sigma}))$ 是状态树根节点散列值， $P(B_H)$被定义为区块$B$的父区块。
 
-The values stemming from the computation of transactions, specifically the transaction receipts, $B_\mathbf{R}$, and that defined through the transactions state-accumulation function, $\Pi$, are formalised later in section \ref{sec:statenoncevalidation}.
+在\ref{sec:statenoncevalidation}章节我们正式定义由交易计算出来的一些值，特别是交易收据$B_\mathbf{R}$，以及通过交易状态收集函数（transactions state-accumulation function） $\Pi$计算出来的一些值。
 
 \subsubsection{序列化}
 
-The function $L_B$ and $L_H$ are the preparation functions for a block and block header respectively. Much like the transaction receipt preparation function $L_R$, we assert the types and order of the structure for when the RLP transformation is required:
+$L_B$和$L_H$对应区块和区块头的准备函数。和交易收据准备函数非常类似，当需要对这两个函数做RLP转换的时候，我们对其类型和结构定义如下：
 \begin{eqnarray}
 \quad L_H(H) & \equiv & (\begin{array}[t]{l}H_p, H_o, H_c, H_r, H_t, H_e, H_b, H_d,\\ H_i, H_l, H_g, H_s, H_x, H_m, H_n \; )\end{array} \\
 \quad L_B(B) & \equiv & \big( L_H(B_H), L_T^*(B_\mathbf{T}), L_H^*(B_\mathbf{U}) \big)
 \end{eqnarray}
 
-With $L_T^*$ and $L_H^*$ being element-wise sequence transformations, thus:
+$L_T^*$ 是 $L_H^*$ 元素维度的序列转换，因此：
 \begin{equation}
-f^*\big( (x_0, x_1, ...) \big) \equiv \big( f(x_0), f(x_1), ... \big) \quad \text{for any function} \; f
+f^*\big( (x_0, x_1, ...) \big) \equiv \big( f(x_0), f(x_1), ... \big) \quad \text{对任意函数} \; f
 \end{equation}
 
-The component types are defined thus:
+各部分类型定义如下：
 \begin{equation}
 \begin{array}[t]{lclclcl}
 H_p \in \mathbb{B}_{32} & \wedge & H_o \in \mathbb{B}_{32} & \wedge & H_c \in \mathbb{B}_{20} & \wedge \\
@@ -444,21 +444,20 @@ H_x \in \mathbb{B} & \wedge & H_m \in \mathbb{B}_{32} & \wedge & H_n \in \mathbb
 \end{array}
 \end{equation}
 
-where
+其中：
 \begin{equation}
 \mathbb{B}_n = \{ B: B \in \mathbb{B} \wedge \lVert B \rVert = n \}
 \end{equation}
 
-We now have a rigorous specification for the construction of a formal block structure. The RLP function $\texttt{\small RLP}$ (see Appendix \ref{app:rlp}) provides the canonical method for transforming this structure into a sequence of bytes ready for transmission over the wire or storage locally.
+现在我们有了一个区块结构的严谨规范。RLP函数$\texttt{\small RLP}$（参见附录\ref{app:rlp}）提供区块序列化成字节数组的标准方法，便于数据通过网络传输或者用于读写本地存储。
+\subsubsection{区块头的合法性}
 
-\subsubsection{Block Header Validity}
-
-We define $P(B_H)$ to be the parent block of $B$, formally:
+我们定义区块$B$的父区块为$P(B_H)$:
 \begin{equation}
 P(H) \equiv B': \mathtt{\tiny KEC}(\mathtt{\tiny RLP}(B'_H)) = H_p
 \end{equation}
 
-The block number is the parent's block number incremented by one:
+区块的序号是父区块序号加1得来：
 \begin{equation}
 H_i \equiv {{P(H)_H}_i} + 1
 \end{equation}
@@ -469,15 +468,15 @@ H_i \equiv {{P(H)_H}_i} + 1
 \newcommand{\expdiffsymb}{\ensuremath{\epsilon}}
 \newcommand{\diffadjustment}{x}
 
-The canonical difficulty of a block of header $H$ is defined as $D(H)$:
+区块头$H$的标准难度$D(H)$定义为：
 \begin{equation}
 D(H) \equiv \begin{dcases}
-\mindifficulty & \text{if} \quad H_i = 0\\
-\text{max}\!\left(\mindifficulty, {P(H)_H}_d + \diffadjustment\times\frontiermod + \expdiffsymb \right) & \text{if} \quad H_i<\firsthomesteadblock\\
-\text{max}\!\left(\mindifficulty, {P(H)_H}_d + \diffadjustment\times\homesteadmod + \expdiffsymb \right) & \text{otherwise}\\
+\mindifficulty & \text{如} \quad H_i = 0\\
+\text{max}\!\left(\mindifficulty, {P(H)_H}_d + \diffadjustment\times\frontiermod + \expdiffsymb \right) & \text{如} \quad H_i<\firsthomesteadblock\\
+\text{max}\!\left(\mindifficulty, {P(H)_H}_d + \diffadjustment\times\homesteadmod + \expdiffsymb \right) & \text{否则}\\
 \end{dcases}
 \end{equation}
-where:
+其中：
 \begin{equation}
 \mindifficulty \equiv 131072
 \end{equation}
@@ -486,8 +485,8 @@ where:
 \end{equation}
 \begin{equation}
 \frontiermod \equiv \begin{cases}
-1 & \text{if} \quad H_s < {P(H)_H}_s + 13 \\
--1 & \text{otherwise} \\
+1 & \text{如} \quad H_s < {P(H)_H}_s + 13 \\
+-1 & \text{否则} \\
 \end{cases}
 \end{equation}
 \begin{equation}
@@ -497,31 +496,32 @@ where:
 \expdiffsymb \equiv \left\lfloor 2^{ \left\lfloor H_i \div 100000 \right\rfloor - 2 } \right\rfloor
 \end{equation}
 
-The canonical gas limit $H_l$ of a block of header $H$ must fulfil the relation:
+区块头$H$的gasLimit$H_l$必须满足：
 \begin{eqnarray}
 & & H_l < {P(H)_H}_l + \left\lfloor\frac{{P(H)_H}_l}{1024}\right\rfloor \quad \wedge \\
 & & H_l > {P(H)_H}_l - \left\lfloor\frac{{P(H)_H}_l}{1024}\right\rfloor \quad \wedge \\
 & & H_l \geqslant 125000
 \end{eqnarray}
 
-$H_s$ is the timestamp of block $H$ and must fulfil the relation:
+区块$H$的时间戳$H_s$必须满足：
 \begin{equation}
 H_s > {P(H)_H}_s
 \end{equation}
 
-This mechanism enforces a homeostasis in terms of the time between blocks; a smaller period between the last two blocks results in an increase in the difficulty level and thus additional computation required, lengthening the likely next period. Conversely, if the period is too large, the difficulty, and expected time to the next block, is reduced.
+这种机制确保了区块间时间间隙的动态平衡。如果最后两个区块间的间隙小，难度值和计算量就会增加，造成下一个区块的间隙的增加。相反，如果最后两个区块间的间隙太大，难度值和下一个块的时间间隙就会降低。
 
-The nonce, $H_n$, must satisfy the relations:
+临造数$H_n$必须满足：
 \begin{equation}
 n \leqslant \frac{2^{256}}{H_d} \quad \wedge \quad m = H_m
 \end{equation}
-with $(n, m) = \mathtt{PoW}(H_{\hcancel{n}}, H_n, \mathbf{d})$.
+其中 $(n, m) = \mathtt{PoW}(H_{\hcancel{n}}, H_n, \mathbf{d})$.
 
-Where $H_{\hcancel{n}}$ is the new block's header $H$, but \textit{without} the nonce and mix-hash components, $\mathbf{d}$ being the current DAG, a large data set needed to compute the mix-hash, and $\mathtt{PoW}$ is the proof-of-work function (see section \ref{ch:pow}): this evaluates to an array with the first item being the mix-hash, to proof that a correct DAG has been used, and the second item being a pseudo-random number cryptographically dependent on $H$ and $\mathbf{d}$. Given an approximately uniform distribution in the range $[0, 2^{64})$, the expected time to find a solution is proportional to the difficulty, $H_d$.
+这里 $H_{\hcancel{n}}$ 是新区块的头$H$，但\textit{不包含} nonce 和 mixHash两个域；$\mathbf{d}$ 是当前 DAG，它是用来计算mixHash的一个很大的数据集；$\mathtt{PoW}$ 是工作量证明函数（参考\ref{ch:pow}章节）。这会形成一个数组，它的第一个值是mixHash，用来证明使用的DAG是对的；它的第二个值是密码学上依赖于$H$和$\mathbf{d}$的一个伪随机数。由于在$[0, 2^{64})$区间的分布基本是均匀的，因此找到答案所需要的时间和难度$H_d$成正比。
 
-This is the foundation of the security of the blockchain and is the fundamental reason why a malicious node cannot propagate newly created blocks that would otherwise overwrite (``rewrite'') history. Because the nonce must satisfy this requirement, and because its satisfaction depends on the contents of the block and in turn its composed transactions, creating new, valid, blocks is difficult and, over time, requires approximately the total compute power of the trustworthy portion of the mining peers.
+这就是区块链安全性的基础，也是为什么恶意节点无法在网络中传播可以篡（``改写'')历史的新区块的根本原因。由于nonce必须满足特定要求，而这种要求又依赖于区块中的内容，即构成该区块的所有交易，因此生成新的合法的区块是有难度的。从长远看，这么做需要恶意节点具有相当于挖矿资源中可信赖部分的全部的计算量。
 
-Thus we are able to define the block header validity function $V(H)$:
+因此我们可以这样定义区块头的验证函数$V(H)$：
+
 \begin{eqnarray}
 V(H) & \equiv &  n \leqslant \frac{2^{256}}{H_d} \wedge m = H_m \quad \wedge \\
 & & H_d = D(H) \quad \wedge \\
@@ -533,10 +533,9 @@ V(H) & \equiv &  n \leqslant \frac{2^{256}}{H_d} \wedge m = H_m \quad \wedge \\
 & & H_i = {P(H)_H}_i +1 \quad \wedge \\
 & & \lVert H_x \rVert \le 32
 \end{eqnarray}
-where $(n, m) = \mathtt{PoW}(H_{\hcancel{n}}, H_n, \mathbf{d})$
+这里 $(n, m) = \mathtt{PoW}(H_{\hcancel{n}}, H_n, \mathbf{d})$
 
-Noting additionally that \textbf{extraData} must be at most 32 bytes.
-
+另外需要注意\textbf{extraData}不能超过32个字节。
 %-------------------------------------
 
 \section{油费和付款} \label{ch:payment}
@@ -545,13 +544,135 @@ Noting additionally that \textbf{extraData} must be at most 32 bytes.
 
 每个交易都有一个与gas相关的特定值：\textbf{gasLimit}。这是值是用发送者账户余额自动购买的gas的数量。购买时使用\textbf{gasPrice}指定的价格，该价格也同样包含在这个交易中。如果账户余额不足，该交易就被认定是无效的。之所以被称为\textbf{gasLimit}，是因为如果交易执行完毕后如果还有未用完的gas，这些剩余的gas会被（按原价）退回，得到的以太会退款到发送者的账户。在交易执行之外gas是不存在的。因此对于那些有可信代码的账户，设置一个较高的gas上限并不会有什么问题。
 
-
-
 总的来说，用来购买gas的以太如果不被退款，就会被转给一个受益人（\textit{beneficiary}）地址 - 这个地址一般是旷工控制的账户的地址。交易人可以自由设定想用的\textbf{gasPrice} ，但旷工也可以自由决定忽略哪些交易。高油费的交易会消耗发送者更多的以太，但对旷工也更有价值，因此被更多旷工放到区块中的可能性就更大。一般来说旷工会公布他们执行交易是愿意接受的最低油价，而交易者在选择油价的时候也可以询问旷工的公布的价格。由于矿工们可接受的最低油价是个（加权的）分布，交易人需要在降低油价和最大化自己的交易被及时挖到之间做个权衡。
 
 %\subsubsection{Determining Computation Costs}
 
 %-------------------------------------
+
+\section{Transaction Execution} \label{ch:transactions}
+
+The execution of a transaction is the most complex part of the Ethereum protocol: it defines the state transition function $\Upsilon$. It is assumed that any transactions executed first pass the initial tests of intrinsic validity. These include:
+
+\begin{enumerate}
+\item The transaction is well-formed RLP, with no additional trailing bytes;
+\item the transaction signature is valid;
+\item the transaction nonce is valid (equivalent to the sender account's current nonce);
+\item the gas limit is no smaller than the intrinsic gas, $g_0$, used by the transaction;
+\item the sender account balance contains at least the cost, $v_0$, required in up-front payment.
+\end{enumerate}
+
+Formally, we consider the function $\Upsilon$, with $T$ being a transaction and $\boldsymbol{\sigma}$ the state:
+\begin{equation}
+\boldsymbol{\sigma}' = \Upsilon(\boldsymbol{\sigma}, T)
+\end{equation}
+
+Thus $\boldsymbol{\sigma}'$ is the post-transactional state. We also define $\Upsilon^g$ to evaluate to the amount of gas used in the execution of a transaction and $\Upsilon^\mathbf{l}$ to evaluate to the transaction's accrued log items, both to be formally defined later.
+
+\subsection{Substate} 
+Throughout transaction execution, we accrue certain information that is acted upon immediately following the transaction. We call this \textit{transaction substate}, and represent it as $A$, which is a tuple:
+\begin{equation}
+A \equiv (A_\mathbf{s}, A_\mathbf{l}, A_r)
+\end{equation}
+
+The tuple contents include $A_\mathbf{s}$, the suicide set: a set of accounts that will be discarded following the transaction's completion. $A_\mathbf{l}$ is the log series: this is a series of archived and indexable `checkpoints' in VM code execution that allow for contract-calls to be easily tracked by onlookers external to the Ethereum world (such as decentralised application front-ends). Finally there is $A_r$, the refund balance, increased through using the {\small SSTORE} instruction in order to reset contract storage to zero from some non-zero value. Though not immediately refunded, it is allowed to partially offset the total execution costs.
+
+For brevity, we define the empty substate $A^0$ to have no suicides, no logs and a zero refund balance:
+\begin{equation}
+A^0 \equiv (\varnothing, (), 0)
+\end{equation}
+
+\subsection{Execution}
+We define intrinsic gas $g_0$, the amount of gas this transaction requires to be paid prior to execution, as follows:
+\begin{align}
+g_0 \equiv {} & \sum_{i \in T_\mathbf{i}, T_\mathbf{d}} \begin{cases} G_{txdatazero} & \text{if} \quad i = 0 \\ G_{txdatanonzero} & \text{otherwise} \end{cases} \\
+{} & + \begin{cases} G_\text{txcreate} & \text{if} \quad T_t = \varnothing \wedge H_i \geq \firsthomesteadblock \\ 0 & \text{otherwise} \end{cases} \\
+{} & + G_{transaction}
+\end{align}
+
+where $T_\mathbf{i},T_\mathbf{d}$ means the series of bytes of the transaction's associated data and initialisation EVM-code, depending on whether the transaction is for contract-creation or message-call. $G_\text{txcreate}$ is added if the transaction is contract-creating, but not if a result of EVM-code or before the {\it Homestead transition}. $G$ is fully defined in Appendix \ref{app:fees}.
+
+%todo Explain g_d reason?
+
+The up-front cost $v_0$ is calculated as:
+\begin{equation}
+v_0 \equiv T_g T_p + T_v
+\end{equation}
+
+The validity is determined as:
+\begin{equation}
+\begin{array}[t]{rcl}
+S(T) & \neq & \varnothing \quad \wedge \\
+\boldsymbol{\sigma}[S(T)] & \neq & \varnothing \quad \wedge \\
+T_n & = & \boldsymbol{\sigma}[S(T)]_n \quad \wedge \\
+g_0 & \leqslant & T_g \quad \wedge \\ 
+v_0 & \leqslant & \boldsymbol{\sigma}[S(T)]_b \quad \wedge \\
+T_g & \leqslant & {B_H}_l - \ell(B_\mathbf{R})_u
+\end{array}
+\end{equation}
+
+Note the final condition; the sum of the transaction's gas limit, $T_g$, and the gas utilised in this block prior, given by $\ell(B_\mathbf{R})_u$, must be no greater than the block's \textbf{gasLimit}, ${B_H}_l$. 
+
+The execution of a valid transaction begins with an irrevocable change made to the state: the nonce of the account of the sender, $S(T)$, is incremented by one and the balance is reduced by part of the up-front cost, $T_gT_p$. The gas available for the proceeding computation, $g$, is defined as $T_g - g_0$. The computation, whether contract creation or a message call, results in an eventual state (which may legally be equivalent to the current state), the change to which is deterministic and never invalid: there can be no invalid transactions from this point.
+
+We define the checkpoint state $\boldsymbol{\sigma}_0$:
+\begin{eqnarray}
+\boldsymbol{\sigma}_0 & \equiv & \boldsymbol{\sigma} \quad \text{except:} \\
+\boldsymbol{\sigma}_0[S(T)]_b & \equiv & \boldsymbol{\sigma}[S(T)]_b - T_g T_p \\
+\boldsymbol{\sigma}_0[S(T)]_n & \equiv & \boldsymbol{\sigma}[S(T)]_n + 1
+\end{eqnarray}
+
+Evaluating $\boldsymbol{\sigma}_P$ from $\boldsymbol{\sigma}_0$ depends on the transaction type; either contract creation or message call; we define the tuple of post-execution provisional state $\boldsymbol{\sigma}_P$, remaining gas $g'$ and substate $A$:
+\begin{equation}
+(\boldsymbol{\sigma}_P, g', A) \equiv \begin{cases}
+\Lambda(\boldsymbol{\sigma}_0, S(T), T_o, &\\ \quad\quad g, T_p, T_v, T_\mathbf{i}, 0) & \text{if} \quad T_t = \varnothing \\
+\Theta_{3}(\boldsymbol{\sigma}_0, S(T), T_o, &\\ \quad\quad T_t, T_t, g, T_p, T_v, T_v, T_\mathbf{d}, 0) & \text{otherwise}
+\end{cases}
+\end{equation}
+
+where $g$ is the amount of gas remaining after deducting the basic amount required to pay for the existence of the transaction:
+\begin{equation}
+g \equiv T_g - g_0
+\end{equation}
+and $T_o$ is the original transactor, which can differ from the sender in the case of a message call or contract creation not directly triggered by a transaction but coming from the execution of EVM-code.
+
+Note we use $\Theta_{3}$ to denote the fact that only the first three components of the function's value are taken; the final represents the message-call's output value (a byte array) and is unused in the context of transaction evaluation.
+
+After the message call or contract creation is processed, the state is finalised by determining the amount to be refunded, $g^*$ from the remaining gas, $g'$, plus some allowance from the refund counter, to the sender at the original rate.
+\begin{equation}
+g^* \equiv g' + \min \{ \Big\lfloor \dfrac{T_g - g'}{2} \Big\rfloor, A_r \}
+\end{equation}
+
+The total refundable amount is the legitimately remaining gas $g'$, added to $A_r$, with the latter component being capped up to a maximum of half (rounded down) of the total amount used $T_g - g'$.
+
+The Ether for the gas is given to the miner, whose address is specified as the beneficiary of the present block $B$. So we define the pre-final state $\boldsymbol{\sigma}^*$ in terms of the provisional state $\boldsymbol{\sigma}_P$:
+\begin{eqnarray}
+\boldsymbol{\sigma}^* & \equiv & \boldsymbol{\sigma}_P \quad \text{except} \\
+\boldsymbol{\sigma}^*[S(T)]_b & \equiv & \boldsymbol{\sigma}_P[S(T)]_b + g^* T_p \\
+\boldsymbol{\sigma}^*[m]_b & \equiv & \boldsymbol{\sigma}_P[m]_b + (T_g - g^*) T_p \\
+m & \equiv & {B_H}_c
+\end{eqnarray}
+
+The final state, $\boldsymbol{\sigma}'$, is reached after deleting all accounts that appear in the suicide list:
+\begin{eqnarray}
+\boldsymbol{\sigma}' & \equiv & \boldsymbol{\sigma}^* \quad \text{except} \\
+\forall i \in A_\mathbf{s}: \boldsymbol{\sigma}'[i] & \equiv & \varnothing
+\end{eqnarray}
+
+And finally, we specify $\Upsilon^g$, the total gas used in this transaction and $\Upsilon^\mathbf{l}$, the logs created by this transaction:
+\begin{eqnarray}
+\Upsilon^g(\boldsymbol{\sigma}, T) & \equiv & T_g - g' \\
+\Upsilon^\mathbf{l}(\boldsymbol{\sigma}, T) & \equiv & A_\mathbf{l}
+\end{eqnarray}
+
+These are used to help define the transaction receipt, discussed later.
+
+%In the case that $s = m$ then we simply return the Ether back to the sender/miner, collapsing the exception into:
+%\begin{eqnarray}
+%\boldsymbol{\sigma}'[s]_b & \equiv & \boldsymbol{\sigma}_P[s]_b + g
+%\end{eqnarray}
+
+
 %-------------------------------------
 %-------------------------------------
 %-------------------------------------
