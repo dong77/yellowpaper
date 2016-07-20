@@ -550,56 +550,56 @@ V(H) & \equiv &  n \leqslant \frac{2^{256}}{H_d} \wedge m = H_m \quad \wedge \\
 
 %-------------------------------------
 
-\section{Transaction Execution} \label{ch:transactions}
+\section{交易执行} \label{ch:transactions}
 
-The execution of a transaction is the most complex part of the Ethereum protocol: it defines the state transition function $\Upsilon$. It is assumed that any transactions executed first pass the initial tests of intrinsic validity. These include:
+交易执行是以太坊协议最复杂的部分：它定义了状态转换函数 $\Upsilon$。任何交易的执行都需要先通过初始状态的内在合法性验证。这包括：
 
 \begin{enumerate}
-\item The transaction is well-formed RLP, with no additional trailing bytes;
-\item the transaction signature is valid;
-\item the transaction nonce is valid (equivalent to the sender account's current nonce);
-\item the gas limit is no smaller than the intrinsic gas, $g_0$, used by the transaction;
-\item the sender account balance contains at least the cost, $v_0$, required in up-front payment.
+\item 交易以正确的RLP形式表示，没有多余字节跟在后面；
+\item 交易的签名正确；
+\item 交易的nonce正确（和发送账号当前nonce相同）；
+\item gasLimit不能小于交易用到的gas数量$g_0$；
+\item 发送者账户余额不小于需要预付的花费$v_0$。
 \end{enumerate}
 
-Formally, we consider the function $\Upsilon$, with $T$ being a transaction and $\boldsymbol{\sigma}$ the state:
+我们这样表达$\Upsilon$函数，其中$T$是交易，$\boldsymbol{\sigma}$是状态：
 \begin{equation}
 \boldsymbol{\sigma}' = \Upsilon(\boldsymbol{\sigma}, T)
 \end{equation}
 
-Thus $\boldsymbol{\sigma}'$ is the post-transactional state. We also define $\Upsilon^g$ to evaluate to the amount of gas used in the execution of a transaction and $\Upsilon^\mathbf{l}$ to evaluate to the transaction's accrued log items, both to be formally defined later.
+$\boldsymbol{\sigma}'$是交易执行后的状态。同时我们定义 $\Upsilon^g$ 为计算该交易执行所需gas的函数，$\Upsilon^\mathbf{l}$为计算该交易累计日志条目的函数。我们后续会给出正式定义。
 
-\subsection{Substate} 
-Throughout transaction execution, we accrue certain information that is acted upon immediately following the transaction. We call this \textit{transaction substate}, and represent it as $A$, which is a tuple:
+\subsection{子状态} 
+在交易执行过程中，我们会收集一些信息，这些信息在交易执行之后会被用到。我们称这些信息为\textit{子状态（transaction substate）}, 用$A$表示。子状态是个元组：
 \begin{equation}
 A \equiv (A_\mathbf{s}, A_\mathbf{l}, A_r)
 \end{equation}
 
-The tuple contents include $A_\mathbf{s}$, the suicide set: a set of accounts that will be discarded following the transaction's completion. $A_\mathbf{l}$ is the log series: this is a series of archived and indexable `checkpoints' in VM code execution that allow for contract-calls to be easily tracked by onlookers external to the Ethereum world (such as decentralised application front-ends). Finally there is $A_r$, the refund balance, increased through using the {\small SSTORE} instruction in order to reset contract storage to zero from some non-zero value. Though not immediately refunded, it is allowed to partially offset the total execution costs.
+元组中包含一个自杀集$A_\mathbf{s}$，它是一组在交易完成后即会被丢弃的账户。$A_\mathbf{l}$是日志，是归档并索引过的虚拟机代码执行的`检查点（checkpoint）'，检查点允许以太坊之外的观察者（比如去中心化应用的前端）方便地追踪合约的调用情况。最后是存储退款额（refund balance）$A_r$，使用{\small SSTORE} 指令释放合约存储空间后退款额会变大。存储退款额虽然不是立即生效，但可以降低合约执行过程中的总花费。
 
-For brevity, we define the empty substate $A^0$ to have no suicides, no logs and a zero refund balance:
+为了简化，我们定义$A^0$为空子状态，它没有自杀集，没有日志，并且退款额为零：
 \begin{equation}
 A^0 \equiv (\varnothing, (), 0)
 \end{equation}
 
-\subsection{Execution}
-We define intrinsic gas $g_0$, the amount of gas this transaction requires to be paid prior to execution, as follows:
+\subsection{执行}
+我们这样定义交易执行前需要预先支付的gas的数量$g_0$：
 \begin{align}
-g_0 \equiv {} & \sum_{i \in T_\mathbf{i}, T_\mathbf{d}} \begin{cases} G_{txdatazero} & \text{if} \quad i = 0 \\ G_{txdatanonzero} & \text{otherwise} \end{cases} \\
-{} & + \begin{cases} G_\text{txcreate} & \text{if} \quad T_t = \varnothing \wedge H_i \geq \firsthomesteadblock \\ 0 & \text{otherwise} \end{cases} \\
+g_0 \equiv {} & \sum_{i \in T_\mathbf{i}, T_\mathbf{d}} \begin{cases} G_{txdatazero} & \text{如} \quad i = 0 \\ G_{txdatanonzero} & \text{否则} \end{cases} \\
+{} & + \begin{cases} G_\text{txcreate} & \text{if} \quad T_t = \varnothing \wedge H_i \geq \firsthomesteadblock \\ 0 & \text{否则} \end{cases} \\
 {} & + G_{transaction}
 \end{align}
 
-where $T_\mathbf{i},T_\mathbf{d}$ means the series of bytes of the transaction's associated data and initialisation EVM-code, depending on whether the transaction is for contract-creation or message-call. $G_\text{txcreate}$ is added if the transaction is contract-creating, but not if a result of EVM-code or before the {\it Homestead transition}. $G$ is fully defined in Appendix \ref{app:fees}.
+这里 $T_\mathbf{i},T_\mathbf{d}$ 是交易的EVM的初始代码或数据，取决于该交易是合约生成类型的交易还是消息调用类型的交易。如果是合约生成类型的交易，$G_\text{txcreate}$会被累加上去；但如果交易不是合约生成型的，或者交易是在{\it 过度到家园（Homestead）分叉}之前执行的，$G_\text{txcreate}$则不会被累加上去。在附录\ref{app:fees}对$G$做了完整定义。
 
 %todo Explain g_d reason?
 
-The up-front cost $v_0$ is calculated as:
+需要预付的花费 $v_0$定义如下：
 \begin{equation}
 v_0 \equiv T_g T_p + T_v
 \end{equation}
 
-The validity is determined as:
+正确性的定义如下:
 \begin{equation}
 \begin{array}[t]{rcl}
 S(T) & \neq & \varnothing \quad \wedge \\
@@ -611,61 +611,62 @@ T_g & \leqslant & {B_H}_l - \ell(B_\mathbf{R})_u
 \end{array}
 \end{equation}
 
-Note the final condition; the sum of the transaction's gas limit, $T_g$, and the gas utilised in this block prior, given by $\ell(B_\mathbf{R})_u$, must be no greater than the block's \textbf{gasLimit}, ${B_H}_l$. 
+注意最后一个条件：该交易的油费上限$T_g$加上该区块之前所有油费消耗之和$\ell(B_\mathbf{R})_u$，不能大于该区块的 \textbf{gasLimit} ${B_H}_l$。
 
-The execution of a valid transaction begins with an irrevocable change made to the state: the nonce of the account of the sender, $S(T)$, is incremented by one and the balance is reduced by part of the up-front cost, $T_gT_p$. The gas available for the proceeding computation, $g$, is defined as $T_g - g_0$. The computation, whether contract creation or a message call, results in an eventual state (which may legally be equivalent to the current state), the change to which is deterministic and never invalid: there can be no invalid transactions from this point.
+一个合法交易的执行伴随着对状态的不可撤销的变更：发送者账户$S(T)$的nonce被加一，账户余额被减去预付款额$T_gT_p$。可用于继续计算的油费$g$等于$T_g - g_0$。无论是合约生成还是消息调用，计算都会结束于一个最终状态（有可能和当前状态一样，这也是合法的）。状态更改是确定性的且保证是合法的：后续不会因此而存在非法交易。
 
-We define the checkpoint state $\boldsymbol{\sigma}_0$:
+我们定义检查点状态（checkpoint state） $\boldsymbol{\sigma}_0$为：
 \begin{eqnarray}
-\boldsymbol{\sigma}_0 & \equiv & \boldsymbol{\sigma} \quad \text{except:} \\
+\boldsymbol{\sigma}_0 & \equiv & \boldsymbol{\sigma} \quad \text{但是} \\
 \boldsymbol{\sigma}_0[S(T)]_b & \equiv & \boldsymbol{\sigma}[S(T)]_b - T_g T_p \\
 \boldsymbol{\sigma}_0[S(T)]_n & \equiv & \boldsymbol{\sigma}[S(T)]_n + 1
 \end{eqnarray}
 
-Evaluating $\boldsymbol{\sigma}_P$ from $\boldsymbol{\sigma}_0$ depends on the transaction type; either contract creation or message call; we define the tuple of post-execution provisional state $\boldsymbol{\sigma}_P$, remaining gas $g'$ and substate $A$:
+我们用$\boldsymbol{\sigma}_P$表示交易后的临时状态。基于$\boldsymbol{\sigma}_0$去计算$\boldsymbol{\sigma}_P$取决于该交易是合约生成还是消息调用。我们定义交易后临时状态$\boldsymbol{\sigma}_P$，剩余油费$g'$和子状态 $A$构成的三元组为：
 \begin{equation}
 (\boldsymbol{\sigma}_P, g', A) \equiv \begin{cases}
-\Lambda(\boldsymbol{\sigma}_0, S(T), T_o, &\\ \quad\quad g, T_p, T_v, T_\mathbf{i}, 0) & \text{if} \quad T_t = \varnothing \\
-\Theta_{3}(\boldsymbol{\sigma}_0, S(T), T_o, &\\ \quad\quad T_t, T_t, g, T_p, T_v, T_v, T_\mathbf{d}, 0) & \text{otherwise}
+\Lambda(\boldsymbol{\sigma}_0, S(T), T_o, &\\ \quad\quad g, T_p, T_v, T_\mathbf{i}, 0) & \text{如} \quad T_t = \varnothing \\
+\Theta_{3}(\boldsymbol{\sigma}_0, S(T), T_o, &\\ \quad\quad T_t, T_t, g, T_p, T_v, T_v, T_\mathbf{d}, 0) & \text{否则}
 \end{cases}
 \end{equation}
 
-where $g$ is the amount of gas remaining after deducting the basic amount required to pay for the existence of the transaction:
+其中$g$是扣除合约存在所需支付的基本花费后的剩余油费：
 \begin{equation}
 g \equiv T_g - g_0
 \end{equation}
-and $T_o$ is the original transactor, which can differ from the sender in the case of a message call or contract creation not directly triggered by a transaction but coming from the execution of EVM-code.
 
-Note we use $\Theta_{3}$ to denote the fact that only the first three components of the function's value are taken; the final represents the message-call's output value (a byte array) and is unused in the context of transaction evaluation.
+$T_o$表示原始交易人（original transactor）。如果消息调用或合约生成不是通过交易出发，而是通过EVM代码的执行而触发的，原始交易人和发送者（sender）就不相同。
 
-After the message call or contract creation is processed, the state is finalised by determining the amount to be refunded, $g^*$ from the remaining gas, $g'$, plus some allowance from the refund counter, to the sender at the original rate.
+注意，我们用$\Theta_{3}$表示方法值中只有前三个被使用。[不知道如何翻译：the final represents the message-call's output value (a byte array) and is unused in the context of transaction evaluation.]
+
+消息调用或者合约生成处理完成后，会从剩余油费$g'$中用同样的价格计算退出款额$g^*$，并累加上退款计数器中的数值。
 \begin{equation}
 g^* \equiv g' + \min \{ \Big\lfloor \dfrac{T_g - g'}{2} \Big\rfloor, A_r \}
 \end{equation}
 
-The total refundable amount is the legitimately remaining gas $g'$, added to $A_r$, with the latter component being capped up to a maximum of half (rounded down) of the total amount used $T_g - g'$.
+退款总额是剩余油费$g'$加上存储退款额$A_r$，但$A_r$被限制到不能超过实际油费消耗$T_g - g'$的一半。
 
-The Ether for the gas is given to the miner, whose address is specified as the beneficiary of the present block $B$. So we define the pre-final state $\boldsymbol{\sigma}^*$ in terms of the provisional state $\boldsymbol{\sigma}_P$:
+购买油费所用的以太会被奖励给旷工，旷工由当前块$B$的受益人所指定。我们通过临时状态$\boldsymbol{\sigma}_P$定以终前状态（pre-final state）$\boldsymbol{\sigma}^*$：
 \begin{eqnarray}
-\boldsymbol{\sigma}^* & \equiv & \boldsymbol{\sigma}_P \quad \text{except} \\
+\boldsymbol{\sigma}^* & \equiv & \boldsymbol{\sigma}_P \quad \text{但是} \\
 \boldsymbol{\sigma}^*[S(T)]_b & \equiv & \boldsymbol{\sigma}_P[S(T)]_b + g^* T_p \\
 \boldsymbol{\sigma}^*[m]_b & \equiv & \boldsymbol{\sigma}_P[m]_b + (T_g - g^*) T_p \\
 m & \equiv & {B_H}_c
 \end{eqnarray}
 
-The final state, $\boldsymbol{\sigma}'$, is reached after deleting all accounts that appear in the suicide list:
+删除自杀集中的所有账户后，就得到了最终状态$\boldsymbol{\sigma}'$：
 \begin{eqnarray}
-\boldsymbol{\sigma}' & \equiv & \boldsymbol{\sigma}^* \quad \text{except} \\
+\boldsymbol{\sigma}' & \equiv & \boldsymbol{\sigma}^* \quad \text{但是} \\
 \forall i \in A_\mathbf{s}: \boldsymbol{\sigma}'[i] & \equiv & \varnothing
 \end{eqnarray}
 
-And finally, we specify $\Upsilon^g$, the total gas used in this transaction and $\Upsilon^\mathbf{l}$, the logs created by this transaction:
+最后我们定义该交易的耗油总量$\Upsilon^g$，以及该交易生成的日志$\Upsilon^\mathbf{l}$为：
 \begin{eqnarray}
 \Upsilon^g(\boldsymbol{\sigma}, T) & \equiv & T_g - g' \\
 \Upsilon^\mathbf{l}(\boldsymbol{\sigma}, T) & \equiv & A_\mathbf{l}
 \end{eqnarray}
 
-These are used to help define the transaction receipt, discussed later.
+它们可以帮助定义我们后续要讲的交易收据。
 
 %In the case that $s = m$ then we simply return the Ether back to the sender/miner, collapsing the exception into:
 %\begin{eqnarray}
