@@ -678,45 +678,49 @@ m & \equiv & {B_H}_c
 
 \section{合约生成} \label{ch:create}
 
-There are number of intrinsic parameters used when creating an account: sender ($s$), original transactor ($o$), available gas ($g$), gas price ($p$), endowment ($v$) together with an arbitrary length byte array, $\mathbf{i}$, the initialisation EVM code and finally the present depth of the message-call/contract-creation stack ($e$).
+生成账户时需要用到几个固定的参数：发送者（sender，$s$），原始交易者（original transactor，$o$），可用油费（$g$），油价（$p$），endowment ($v$)，一个包含EVM初始化代码的任意长度的字节数组$\mathbf{i}$，和当前消息调用/合约生成栈的深度（$e$）。
 
-We define the creation function formally as the function $\Lambda$, which evaluates from these values, together with the state $\boldsymbol{\sigma}$ to the tuple containing the new state, remaining gas and accrued transaction substate $(\boldsymbol{\sigma}', g', A)$, as in section \ref{ch:transactions}:
+我们正式定义生成函数为$\Lambda$。生成函数的计算除了需要上述参数，还需要状态 $\boldsymbol{\sigma}$，以及我们在\ref{ch:transactions}章节描述的，一个包括新状态，剩余油费，和交易子状态的三元组$(\boldsymbol{\sigma}', g', A)$：
+
 \begin{equation}
 (\boldsymbol{\sigma}', g', A) \equiv \Lambda(\boldsymbol{\sigma}, s, o, g, p, v, \mathbf{i}, e)
 \end{equation}
 
-The address of the new account is defined as being the rightmost 160 bits of the Keccak hash of RLP encoding of the structure containing only the sender and the nonce. Thus we define the resultant address for the new account $a$:
+新账户$a$的地址被定为发送者（sender）和nonce经过RLP编码后的Keccak散列值的最右160位：
 \begin{equation}
 a \equiv \mathcal{B}_{96..255}\Big(\mathtt{\tiny KEC}\Big(\mathtt{\tiny RLP}\big(\;(s, \boldsymbol{\sigma}[s]_n - 1)\;\big)\Big)\Big)
 \end{equation}
 
-where $\mathtt{\tiny KEC}$ is the Keccak 256-bit hash function, $\mathtt{\tiny RLP}$ is the RLP encoding function, $\mathcal{B}_{a..b}(X)$ evaluates to binary value containing the bits of indices in the range $[a, b]$ of the binary data $X$ and $\boldsymbol{\sigma}[x]$ is the address state of $x$ or $\varnothing$ if none exists. Note we use one fewer than the sender's nonce value; we assert that we have incremented the sender account's nonce prior to this call, and so the value used is the sender's nonce at the beginning of the responsible transaction or VM operation.
+这里 $\mathtt{\tiny KEC}$ 是256位Keccak散列函数，$\mathtt{\tiny RLP}$是RLP编码函数，
+$\mathcal{B}_{a..b}(X)$计算出二进制数据$X$在$[a, b]$索引区间的比特值；$\boldsymbol{\sigma}[x]$是$x$的地址状态（不存在则为$\varnothing$）。注意我们用的nonce值比发送者的nonce值小1；我们确信在调用该方法前发送者账户的nounce已经加1了，因此我们用的值是交易或者虚拟机操作之初发送者的nonce值。
 
-The account's nonce is initially defined as zero, the balance as the value passed, the storage as empty and the code hash as the Keccak 256-bit hash of the empty string; the sender's balance is also reduced by the value passed. Thus the mutated state becomes $\boldsymbol{\sigma}^*$:
+生成的新账户nonce初始值为零，余额等于传入参数的值，存储空间为空，代码哈希为空字符串的Keccak 256位散列值；同时发送者账户余额会被扣掉传入参数的值。 因此变化后的状态为 $\boldsymbol{\sigma}^*$：
 \begin{equation}
-\boldsymbol{\sigma}^* \equiv \boldsymbol{\sigma} \quad \text{except:}
+\boldsymbol{\sigma}^* \equiv \boldsymbol{\sigma} \quad \text{但是:}
 \end{equation}
 \begin{eqnarray}
 \boldsymbol{\sigma}^*[a] &\equiv& \big( 0, v + v', \mathtt{\tiny TRIE}(\varnothing), \mathtt{\tiny KEC}\big(()\big) \big) \\
 \boldsymbol{\sigma}^*[s]_b &\equiv& \boldsymbol{\sigma}[s]_b - v
 \end{eqnarray}
 
-where $v'$ is the account's pre-existing value, in the event it was previously in existence:
+其中 $v'$是该账户存在前的余额，如果它曾经存在过：
 \begin{equation}
 v' \equiv \begin{cases}
-0 & \text{if} \quad \boldsymbol{\sigma}[a] = \varnothing\\
-\boldsymbol{\sigma}[a]_b & \text{otherwise}
+0 & \text{如果} \quad \boldsymbol{\sigma}[a] = \varnothing\\
+\boldsymbol{\sigma}[a]_b & \text{否则}
 \end{cases}
 \end{equation}
 
 %It is asserted that the state database will also change such that it defines the pair $(\mathtt{\tiny KEC}(\mathbf{b}), \mathbf{b})$.
 
-Finally, the account is initialised through the execution of the initialising EVM code $\mathbf{i}$ according to the execution model (see section \ref{ch:model}). Code execution can effect several events that are not internal to the execution state: the account's storage can be altered, further accounts can be created and further message calls can be made. As such, the code execution function $\Xi$ evaluates to a tuple of the resultant state $\boldsymbol{\sigma}^{**}$, available gas remaining $g^{**}$, the accrued substate $A$ and the body code of the account $\mathbf{o}$.
+最后，该账号的初始化代码会依照执行模型(参见\ref{ch:model})来对账号进行初始化。代码执行可以造成几个外在影响：该账号的存储空间可被更改，也可能生成更多账户，或发生更多的消息调用。正因如此，代码执行函数$\Xi$的结果是一个元组，包括结果状态$\boldsymbol{\sigma}^{**}$，可用gas余额$g^{**}$，累积子状态$A$，以及账号的主代码$\mathbf{o}$。
 
 \begin{equation}
 (\boldsymbol{\sigma}^{**}, g^{**}, A, \mathbf{o}) \equiv \Xi(\boldsymbol{\sigma}^*, g, I) \\
 \end{equation}
-where $I$ contains the parameters of the execution environment as defined in section \ref{ch:model}, that is:
+
+其中$I$包含在\ref{ch:model}章节定义的运行环境参数，即：
+
 \begin{eqnarray}
 I_a & \equiv & a \\
 I_o & \equiv & o \\
@@ -728,42 +732,42 @@ I_\mathbf{b} & \equiv & \mathbf{i} \\
 I_e & \equiv & e
 \end{eqnarray}
 
-$I_\mathbf{d}$ evaluates to the empty tuple as there is no input data to this call. $I_H$ has no special treatment and is determined from the blockchain.
+因为该调用没有输入数据，$I_\mathbf{d}$的执行结果是空元组。$I_H$没有特殊处理并且由区块链决定。
 
-Code execution depletes gas, and gas may not go below zero, thus execution may exit before the code has come to a natural halting state. In this (and several other) exceptional cases we say an Out-of-Gas exception has occurred: The evaluated state is defined as being the empty set, $\varnothing$, and the entire create operation should have no effect on the state, effectively leaving it as it was immediately prior to attempting the creation. 
+代码执行消耗gas，但gas不可以小于零，因此代码执行在到达正常终结状态前就可能退出。在这种（以及其他一些）异常情况下，我们就说出现了Out-of-Gas（邮费耗尽）异常：结果状态被定义为空，$\varnothing$，并且整个账户生成操作对状态不应该有任何影响，状态和尝试账户生成之前的状态完全相同。
 
-If the initialization code completes successfully, a final contract-creation cost is paid, the code-deposit cost, $c$, proportional to the size of the created contract's code:
+如果账号初始化代码执行成功，还需要支付一笔账户生成费用，即代码提交费$c$，它和生成账户主代码的大小成正比：
+
 \begin{equation}
 c \equiv G_{codedeposit} \times |\mathbf{o}|
 \end{equation}
 
-If there is not enough gas remaining to pay this, \ie $g^{**} < c$, then we also declare an Out-of-Gas exception.
+如果没有足够gas支付这笔费用，即 $g^{**} < c$，那么也会抛出Out-of-Gas异常。
 
-The gas remaining will be zero in any such exceptional condition, \ie if the creation was conducted as the reception of a transaction, then this doesn't affect payment of the intrinsic cost of contract creation; it is paid regardless. However, the value of the transaction is not transferred to the aborted contract's address when we are Out-of-Gas.
+在任何这种异常情况下，gas余额都会是零。比如，合约生成如果是由某个交易触发的，那么异常不会影响合约生成所需要的花费，该花费无论如何要付掉。尽管如此，当出现Out-of-Gas异常的时候，交易中的价值不会被转移到被中止生成的合约中。
 
-If such an exception does not occur, then the remaining gas is refunded to the originator and the now-altered state is allowed to persist. Thus formally, we may specify the resultant state, gas and substate as $(\boldsymbol{\sigma}', g', A)$ where:
+如果没有出现这种异常，剩余的gas会被返还给发起者，已经更改的状态会得以保存。因此，我们可以将结果状态，gas，和子状态$(\boldsymbol{\sigma}', g', A)$这样定义：
 
 \begin{align}
 \quad g' &\equiv \begin{cases}
-0 & \text{if} \quad \boldsymbol{\sigma}^{**} = \varnothing \\
-g^{**} & \text{if} \quad g^{**}<c \wedge H_i<\firsthomesteadblock \\
-g^{**} - c & \text{otherwise} \\
+0 & \text{如果} \quad \boldsymbol{\sigma}^{**} = \varnothing \\
+g^{**} & \text{如果} \quad g^{**}<c \wedge H_i<\firsthomesteadblock \\
+g^{**} - c & \text{否则} \\
 \end{cases} \\
 \quad \boldsymbol{\sigma}' &\equiv  \begin{cases}
-\boldsymbol{\sigma} & \text{if} \quad \boldsymbol{\sigma}^{**} = \varnothing \\
-\boldsymbol{\sigma}^{**} & \text{if} \quad g^{**}<c \wedge H_i<\firsthomesteadblock \\
-\boldsymbol{\sigma}^{**} \quad \text{except:} & \\
-\quad\boldsymbol{\sigma}'[a]_c = \texttt{\small KEC}(\mathbf{o}) & \text{otherwise}
+\boldsymbol{\sigma} & \text{如果} \quad \boldsymbol{\sigma}^{**} = \varnothing \\
+\boldsymbol{\sigma}^{**} & \text{如果} \quad g^{**}<c \wedge H_i<\firsthomesteadblock \\
+\boldsymbol{\sigma}^{**} \quad \text{但:} & \\
+\quad\boldsymbol{\sigma}'[a]_c = \texttt{\small KEC}(\mathbf{o}) & \text{否则}
 \end{cases}
 \end{align}
 
-The exception in the determination of $\boldsymbol{\sigma}'$ dictates that $\mathbf{o}$, the resultant byte sequence from the execution of the initialisation code, specifies the final body code for the newly-created account.
+计算$\boldsymbol{\sigma}'$公式中的例外情况，决定了初始化代码执行结果的字符序列其实就是新合约账户的主代码。
 
-Note that the intention from block \firsthomesteadblock\ onwards ({\it Homestead}) is that the result is either a successfully created new contract with its endowment, or no new contract with no transfer of value. Before {\it Homestead}, if there is not enough gas to pay $c$, an account at the new contract's address is created, along with all the initialisation side-effects, and the value is transferred, but no contract code is deployed.
+注意，从第\firsthomesteadblock\ 个块开始({\it Homestead}) ，账户生成的结果要么是一个附带捐款的合约，要么是一个没有捐款的新合约。在 {\it Homestead}之前，如果没有足够的gas来支付$c$，新合约账号也会被生成，初始代码也会被执行并产生影响，捐款也会被转账，但合约主代码不会被提交存储。
 
-\subsection{Subtleties}
-Note that while the initialisation code is executing, the newly created address exists but with no intrinsic body code. Thus any message call received by it during this time causes no code to be executed. If the initialisation execution ends with a {\small SUICIDE} instruction, the matter is moot since the account will be deleted before the transaction is completed. For a normal {\small STOP} code, or if the code returned is otherwise empty, then the state is left with a zombie account, and any remaining balance will be locked into the account forever.
-
+\subsection{几处细节}
+注意，在初始化代码执行过程中，新地址是存在的，但它还没有主代码（body code）。因此它在此期间接收到的任何消息调用都不会造成代码被运行。如果初始化代码执行的结果是一个{\small SUICIDE}指令，就会造成交易执行完之前该账户就被删掉了，交易也就没有意义了。如果代码执行结果是{\small STOP}指令，或者返回结果是空值，那么就会留下一个僵尸账户，它的任何余额都会被永久锁住。
 
 %-------------------------------------
 %-------------------------------------
